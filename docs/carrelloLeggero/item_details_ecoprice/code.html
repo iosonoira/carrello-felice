@@ -1,0 +1,303 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Item Details - EcoPrice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-tint": "#006c4a",
+                "tertiary-fixed": "#c3ecd7",
+                "on-surface-variant": "#3d4a42",
+                "surface-container-low": "#f3f4f5",
+                "surface-container": "#edeeef",
+                "on-secondary": "#ffffff",
+                "inverse-on-surface": "#f0f1f2",
+                "on-tertiary": "#ffffff",
+                "error": "#ba1a1a",
+                "on-tertiary-container": "#f5fff7",
+                "on-error-container": "#93000a",
+                "tertiary-fixed-dim": "#a8cfbc",
+                "secondary-fixed": "#c5eccc",
+                "error-container": "#ffdad6",
+                "on-primary": "#ffffff",
+                "inverse-surface": "#2e3132",
+                "surface-container-highest": "#e1e3e4",
+                "secondary-container": "#c2e9c9",
+                "surface-variant": "#e1e3e4",
+                "background": "#f8f9fa",
+                "inverse-primary": "#68dba9",
+                "surface-dim": "#d9dadb",
+                "tertiary": "#3f6353",
+                "on-tertiary-fixed-variant": "#294e3f",
+                "on-background": "#191c1d",
+                "primary-container": "#00855d",
+                "on-primary-fixed": "#002114",
+                "tertiary-container": "#577c6b",
+                "on-secondary-fixed-variant": "#2c4e36",
+                "surface-container-high": "#e7e8e9",
+                "primary-fixed": "#85f8c4",
+                "on-primary-container": "#f5fff7",
+                "on-primary-fixed-variant": "#005137",
+                "on-secondary-fixed": "#00210e",
+                "on-error": "#ffffff",
+                "secondary": "#43664d",
+                "on-tertiary-fixed": "#002115",
+                "surface-container-lowest": "#ffffff",
+                "primary-fixed-dim": "#68dba9",
+                "primary": "#006948",
+                "surface-bright": "#f8f9fa",
+                "on-secondary-container": "#486a51",
+                "outline-variant": "#bccac0",
+                "secondary-fixed-dim": "#aad0b1",
+                "on-surface": "#191c1d",
+                "outline": "#6d7a72",
+                "surface": "#f8f9fa"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-desktop": "40px",
+                "gutter": "16px",
+                "container-max": "1200px",
+                "xs": "4px",
+                "lg": "24px",
+                "xl": "32px",
+                "margin-mobile": "16px",
+                "sm": "8px",
+                "base": "8px",
+                "md": "16px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "Public Sans"
+                ],
+                "body-lg": [
+                        "Public Sans"
+                ],
+                "headline-lg": [
+                        "Public Sans"
+                ],
+                "headline-sm": [
+                        "Public Sans"
+                ],
+                "label-sm": [
+                        "Public Sans"
+                ],
+                "body-md": [
+                        "Public Sans"
+                ],
+                "label-md": [
+                        "Public Sans"
+                ],
+                "headline-md": [
+                        "Public Sans"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style data-stitch-cursor="">*{cursor:crosshair!important}[contenteditable="true"]:focus,.cursor-text:focus{cursor:text!important}</style><style data-stitch-scroll-lock="">html,body{overflow:hidden!important}</style></head>
+<body class="bg-background text-on-background min-h-screen antialiased flex flex-col pb-[120px] md:pb-0 pt-16">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-xl shadow-sm">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200 text-on-surface-variant dark:text-outline">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<span class="font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed tracking-tight">CarrelloLeggero</span>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200 text-on-surface-variant dark:text-outline">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite_border</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col max-w-4xl mx-auto w-full px-margin-mobile py-lg gap-lg">
+<!-- Product Hero Section (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Image Card -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,105,72,0.04)] aspect-square flex items-center justify-center overflow-hidden">
+<img alt="Fresh organic avocados on a clean minimalist surface" class="w-full h-full object-cover rounded-lg mix-blend-multiply" data-alt="A high-quality, brightly lit photograph of fresh organic avocados resting on a clean, stark white minimalist surface. The lighting is soft and even, typical of premium lifestyle product photography, casting subtle, airy shadows. The vibrant, natural green of the avocados contrasts beautifully with the pristine background, reflecting the healthy, organic aesthetic of the brand. The composition is simple, elegant, and perfectly centered, emphasizing freshness and quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqenHNcgH-Tf6HwVg9l6WNlEc6hpnZrl3M4-iPR1FFoQPce1DMrJp-sxjl7OWSGhv6o5AGGoX5jybY79pNrGwCUPATWojKvetZEIF9XKWsAIUDEgz3vJEo2NcWc1F77PrDViwkm44hiUCFtY4S4-CfCitsnwqEcZb1KpP4Nb9iJvZvUPY4HzjUX42o60fksHGJyl3hDpeeBMIFiX-s1RXO2-2ClGf_uYzyW_2aVyn23nydT7nkzQsyVYbBuitAx-By7gcwecX85kg">
+</div>
+<!-- Product Info Card -->
+<div class="flex flex-col justify-center gap-md bg-surface-container-lowest rounded-xl p-lg shadow-[0_4px_12px_rgba(0,105,72,0.04)]">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label-md text-label-md text-outline tracking-widest uppercase">Produce</span>
+<h1 class="font-headline-lg text-headline-lg text-on-background mt-1">Organic Hass Avocados</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Pack of 4, perfectly ripe and ready to eat. Sourced locally when possible to ensure peak freshness and quality.</p>
+</div>
+</div>
+<div class="mt-auto pt-lg flex items-center gap-4">
+<button class="flex-grow bg-primary text-on-primary font-label-md text-label-md h-[48px] rounded-full flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-sm active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add_shopping_cart</span>
+                        Add to List
+                    </button>
+</div>
+</div>
+</div>
+<!-- Price Comparison Section -->
+<section class="flex flex-col gap-md mt-lg">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-background">Compare Prices</h2>
+<span class="font-label-md text-label-md text-outline">3 Stores Nearby</span>
+</div>
+<!-- Store Cards (Glassmorphism inspired) -->
+<div class="flex flex-col gap-base">
+<!-- Best Price Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md flex items-center justify-between border border-tertiary-container/30 shadow-[0_4px_12px_rgba(0,105,72,0.04)] relative overflow-hidden transition-transform active:scale-[0.98]">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-container"></div>
+<div class="flex items-center gap-4 pl-2">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">storefront</span>
+</div>
+<div>
+<h3 class="font-body-lg text-body-lg font-medium text-on-background">Fresh Market</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> 1.2 mi away
+                            </p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-headline-md text-headline-md text-on-background">$3.99</span>
+<span class="bg-tertiary-container text-on-tertiary-container font-label-md text-label-md px-2 py-0.5 rounded-full text-[11px] font-bold">BEST PRICE</span>
+</div>
+</div>
+<!-- Other Store Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-md flex items-center justify-between border border-transparent hover:border-outline-variant/30 shadow-[0_2px_8px_rgba(0,105,72,0.02)] transition-all active:scale-[0.98]">
+<div class="flex items-center gap-4 pl-2">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">storefront</span>
+</div>
+<div>
+<h3 class="font-body-lg text-body-lg font-medium text-on-background">City Grocers</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> 0.8 mi away
+                            </p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-headline-md text-headline-md text-on-background">$4.49</span>
+</div>
+</div>
+<!-- Other Store Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-md flex items-center justify-between border border-transparent hover:border-outline-variant/30 shadow-[0_2px_8px_rgba(0,105,72,0.02)] transition-all active:scale-[0.98]">
+<div class="flex items-center gap-4 pl-2">
+<div class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">storefront</span>
+</div>
+<div>
+<h3 class="font-body-lg text-body-lg font-medium text-on-background">Organic Whole Foods</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> 3.5 mi away
+                            </p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-headline-md text-headline-md text-on-background">$5.99</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom spacing for mobile nav -->
+<div class="h-8"></div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-8 bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-xl rounded-t-xl shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-all active:scale-90 duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed bg-secondary-container/30 rounded-full px-4 py-1 hover:bg-surface-container-low transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-md text-label-md">Compare</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-all active:scale-90 duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">map</span>
+<span class="font-label-md text-label-md">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-all active:scale-90 duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-label-md">Account</span>
+</a>
+</nav>
+
+
+</body></html>

@@ -93,7 +93,7 @@ Every DTO and domain entity must use `freezed`. Run build_runner after any chang
 ```dart
 // ✅ Correct DTO pattern
 @freezed
-class ProductDto with _$ProductDto {
+abstract class ProductDto with _$ProductDto {
   const factory ProductDto({
     required String id,
     required String name,
@@ -142,15 +142,13 @@ final class NotFoundFailure extends Failure { ... }
 
 ## Design Reference
 
-> ⚠️ `DESIGN.md` has not been created yet — it will be added to the project root.
->
-> When it exists, read it before making any UI or theming decision. It will define:
-> - Color palette and typography tokens
-> - Component visual specifications
-> - Spacing and layout rules
-> - Dark/light mode strategy
->
-> Until `DESIGN.md` is present, do not hardcode colors or text styles. Use `Theme.of(context)` exclusively.
+`DESIGN.md` is now available in the project root. **Read it before making any UI or theming decision.** It defines:
+- Color palette and typography tokens
+- Component visual specifications
+- Spacing and layout rules
+- Dark/light mode strategy
+
+Ensure all UI implementations and theming decisions align with the specifications in [DESIGN.md](file:///c:/Users/Matteo/Desktop/TS/carrello_leggero/DESIGN.md). Do not hardcode colors or text styles.
 
 ---
 
