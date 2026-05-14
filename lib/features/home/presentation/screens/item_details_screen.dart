@@ -2,11 +2,15 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/mock_data.dart';
+import '../../domain/entities/product.dart';
+import '../../domain/entities/store.dart';
+import '../providers/product_provider.dart';
+import '../providers/store_provider.dart';
 import '../widgets/app_bar.dart';
 
 /// ItemDetailsScreen displays detailed information for a selected product.
@@ -16,18 +20,21 @@ import '../widgets/app_bar.dart';
 /// - Product hero section with image and info (responsive layout)
 /// - Compare prices section showing prices from nearby stores
 /// - Bottom navigation bar with Compare tab active
-class ItemDetailsScreen extends StatelessWidget {
+class ItemDetailsScreen extends ConsumerWidget {
   /// Creates an [ItemDetailsScreen].
-  ///
-  /// The [productId] parameter is passed but not used (ready for future routing).
-  /// Currently always displays selectedProduct from mock_data.
   const ItemDetailsScreen({
     super.key,
-    required String productId,
+    required this.productId,
   });
 
+  /// The ID of the product to display.
+  final String productId;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productAsync = ref.watch(productDetailProvider(productId));
+    final storesAsync = ref.watch(storesForProductProvider(productId));
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: EcoPriceAppBar(
@@ -46,128 +53,148 @@ class ItemDetailsScreen extends StatelessWidget {
           );
         },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Product Hero Section
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.marginMobile,
-                vertical: AppSpacing.stackMd,
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final isMobile = constraints.maxWidth < 768;
-
-                  if (isMobile) {
-                    // Mobile: Column layout (image above, info below)
-                    return Column(
-                      children: [
-                        // Image card
-                        _buildProductImageCard(),
-                        const SizedBox(height: AppSpacing.stackMd),
-                        // Info card
-                        _buildProductInfoCard(context),
-                      ],
-                    );
-                  } else {
-                    // Desktop: Row layout (image left, info right)
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Image card
-                        Flexible(
-                          flex: 1,
-                          child: _buildProductImageCard(),
-                        ),
-                        const SizedBox(width: AppSpacing.stackMd),
-                        // Info card
-                        Flexible(
-                          flex: 1,
-                          child: _buildProductInfoCard(context),
-                        ),
-                      ],
-                    );
-                  }
-                },
-              ),
-            ),
-
-            // Compare Prices Section
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.marginMobile,
-                vertical: AppSpacing.stackMd,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header: "Compare Prices" + "3 Stores Nearby"
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Compare Prices',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          height: 32 / 24,
-                          color: AppColors.onSurface,
-                        ),
-                      ),
-                      Text(
-                        '${storesForProduct.length} Stores Nearby',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          height: 20 / 14,
-                          letterSpacing: 0.7,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.stackMd),
-
-                  // Store price cards
-                  ...storesForProduct.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final store = entry.value;
-                    final isHighlighted = index == 0; // First store is highlighted
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.stackMd),
-                      child: GestureDetector(
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Store details for ${store.name} not yet implemented'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        child: _buildStorePriceCard(
-                          store: store,
-                          isHighlighted: isHighlighted,
-                        ),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-
-            // Bottom spacer for bottom nav
-            const SizedBox(height: 100),
-          ],
-        ),
-      ),
+      body: _buildBody(context, productAsync, storesAsync),
       bottomNavigationBar: _buildCustomBottomNav(context),
     );
   }
 
+  Widget _buildBody(
+    BuildContext context,
+    AsyncValue<Product> productAsync,
+    AsyncValue<List<Store>> storesAsync,
+  ) {
+    return switch ((productAsync, storesAsync)) {
+      (AsyncLoading<Product>(), _) || (_, AsyncLoading<List<Store>>()) =>
+        const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      (AsyncError<Product>(error: final err), _) =>
+        Center(child: Text(err.toString())),
+      (_, AsyncError<List<Store>>(error: final err)) =>
+        Center(child: Text(err.toString())),
+      (
+        AsyncData<Product>(value: final product),
+        AsyncData<List<Store>>(value: final stores),
+      ) =>
+        _buildScrollContent(context, product, stores),
+    };
+  }
+
+  Widget _buildScrollContent(
+    BuildContext context,
+    Product product,
+    List<Store> stores,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Product Hero Section
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.marginMobile,
+              vertical: AppSpacing.stackMd,
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.maxWidth < 768;
+
+                if (isMobile) {
+                  return Column(
+                    children: [
+                      _buildProductImageCard(product),
+                      const SizedBox(height: AppSpacing.stackMd),
+                      _buildProductInfoCard(context, product),
+                    ],
+                  );
+                } else {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: _buildProductImageCard(product),
+                      ),
+                      const SizedBox(width: AppSpacing.stackMd),
+                      Flexible(
+                        flex: 1,
+                        child: _buildProductInfoCard(context, product),
+                      ),
+                    ],
+                  );
+                }
+              },
+            ),
+          ),
+
+          // Compare Prices Section
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.marginMobile,
+              vertical: AppSpacing.stackMd,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Compare Prices',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        height: 32 / 24,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    Text(
+                      '${stores.length} Stores Nearby',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        height: 20 / 14,
+                        letterSpacing: 0.7,
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.stackMd),
+
+                ...stores.asMap().entries.map((entry) {
+                  final isHighlighted = entry.key == 0;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.stackMd),
+                    child: GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Store details for ${entry.value.name} not yet implemented',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: _buildStorePriceCard(
+                        store: entry.value,
+                        isHighlighted: isHighlighted,
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+
   /// Builds the product image card with rounded corners, soft shadow, and error fallback.
-  Widget _buildProductImageCard() {
+  Widget _buildProductImageCard(Product product) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
@@ -186,7 +213,7 @@ class ItemDetailsScreen extends StatelessWidget {
         child: AspectRatio(
           aspectRatio: 1,
           child: CachedNetworkImage(
-            imageUrl: selectedProduct.imageUrl,
+            imageUrl: product.imageUrl,
             fit: BoxFit.cover,
             errorWidget: (context, url, error) {
               return Container(
@@ -232,7 +259,7 @@ class ItemDetailsScreen extends StatelessWidget {
   }
 
   /// Builds the product info card with category, name, description, and add to list button.
-  Widget _buildProductInfoCard(BuildContext context) {
+  Widget _buildProductInfoCard(BuildContext context, Product product) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
@@ -250,9 +277,8 @@ class ItemDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Category label (uppercase, Label-MD, variant color)
           Text(
-            selectedProduct.category.toUpperCase(),
+            product.category.toUpperCase(),
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -262,10 +288,8 @@ class ItemDetailsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.stackSm),
-
-          // Product name (Headline-LG, 32px, weight 700, -0.02em spacing)
           Text(
-            selectedProduct.name,
+            product.name,
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w700,
@@ -275,10 +299,8 @@ class ItemDetailsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.stackSm),
-
-          // Description (Body-MD, variant color)
           Text(
-            selectedProduct.description,
+            product.description,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
@@ -287,10 +309,8 @@ class ItemDetailsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.stackMd),
-
-          // Price display
           Text(
-            '\$${selectedProduct.price.toStringAsFixed(2)}${selectedProduct.unit}',
+            '\$${product.price.toStringAsFixed(2)}${product.unit}',
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w600,
@@ -299,8 +319,6 @@ class ItemDetailsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.stackMd),
-
-          // "Add to List" button (ElevatedButton, Primary bg, full width, 48px height, rounded full)
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -340,7 +358,7 @@ class ItemDetailsScreen extends StatelessWidget {
   ///
   /// If [isHighlighted] is true, shows a left accent bar and "BEST PRICE" badge.
   Widget _buildStorePriceCard({
-    required dynamic store,
+    required Store store,
     required bool isHighlighted,
   }) {
     return Container(
@@ -366,7 +384,6 @@ class ItemDetailsScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Left accent bar for highlighted card
           if (isHighlighted)
             Container(
               width: 4,
@@ -379,14 +396,11 @@ class ItemDetailsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-          // Store info and price
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.stackMd),
               child: Row(
                 children: [
-                  // Store details (left side)
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,8 +454,6 @@ class ItemDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  // Price (right side)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -504,7 +516,6 @@ class ItemDetailsScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Home tab
               _buildNavItem(
                 icon: Icons.home_filled,
                 label: 'Home',
@@ -513,16 +524,12 @@ class ItemDetailsScreen extends StatelessWidget {
                   context.go('/');
                 },
               ),
-              // Compare tab (active)
               _buildNavItem(
                 icon: Icons.compare_arrows,
                 label: 'Compare',
                 isActive: true,
-                onTap: () {
-                  // Already on compare screen
-                },
+                onTap: () {},
               ),
-              // Map tab
               _buildNavItem(
                 icon: Icons.location_on,
                 label: 'Map',
@@ -536,7 +543,6 @@ class ItemDetailsScreen extends StatelessWidget {
                   );
                 },
               ),
-              // Account tab
               _buildNavItem(
                 icon: Icons.person,
                 label: 'Account',

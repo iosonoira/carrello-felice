@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/models/store.dart';
+import '../../domain/entities/store.dart';
 import 'store_card.dart';
 
 /// A section widget displaying nearby stores with a featured store and grid of additional stores.

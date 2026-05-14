@@ -4,6 +4,8 @@ import 'product_datasource.dart';
 
 /// Mock implementation of [ProductDatasource] for development and testing.
 final class ProductMockDatasource implements ProductDatasource {
+  const ProductMockDatasource();
+
   static const _products = <ProductDto>[
     ProductDto(
       id: '1',

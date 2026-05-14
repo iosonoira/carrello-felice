@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/models/product.dart';
+import '../../domain/entities/product.dart';
 
 /// A card widget displaying a trending product with image, category, name, and price.
 ///

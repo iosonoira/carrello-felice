@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/mock_data.dart';
+import '../providers/product_provider.dart';
+import '../providers/store_provider.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/nearby_stores_section.dart';
 import '../widgets/search_bar.dart';
@@ -19,12 +21,15 @@ import '../widgets/trending_item_card.dart';
 /// - Horizontal scrollable list of trending items
 /// - Nearby stores section with featured and grid stores
 /// - Bottom navigation bar with Home active
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   /// Creates a [HomeScreen].
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productsAsync = ref.watch(productsProvider);
+    final nearbyStoresAsync = ref.watch(nearbyStoresProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: const EcoPriceAppBar(
@@ -61,7 +66,6 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header with "Trending Items" and "See All"
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -76,7 +80,6 @@ class HomeScreen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Navigate to see all trending items (future implementation)
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('See all trending items'),
@@ -97,25 +100,39 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.stackMd),
 
-                  // Horizontal scrollable list of trending items
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        ...mockProducts.map(
-                          (product) => Padding(
-                            padding: const EdgeInsets.only(
-                              right: AppSpacing.stackMd,
-                            ),
-                            child: TrendingItemCard(
-                              product: product,
-                              onTap: () {
-                                context.push('/item/${product.id}');
-                              },
+                  // Horizontal scrollable product list
+                  productsAsync.when(
+                    loading: () => const SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    error: (err, _) => SizedBox(
+                      height: 200,
+                      child: Center(child: Text(err.toString())),
+                    ),
+                    data: (products) => SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          ...products.map(
+                            (product) => Padding(
+                              padding: const EdgeInsets.only(
+                                right: AppSpacing.stackMd,
+                              ),
+                              child: TrendingItemCard(
+                                product: product,
+                                onTap: () {
+                                  context.push('/item/${product.id}');
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -125,18 +142,30 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.stackLg),
 
             // Nearby stores section
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.stackMd),
-              child: NearbyStoresSection(
-                stores: mockStores,
-                onStoreTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Store details not yet implemented'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
+            nearbyStoresAsync.when(
+              loading: () => const SizedBox(
+                height: 200,
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              ),
+              error: (err, _) => SizedBox(
+                height: 200,
+                child: Center(child: Text(err.toString())),
+              ),
+              data: (stores) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.stackMd),
+                child: NearbyStoresSection(
+                  stores: stores,
+                  onStoreTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Store details not yet implemented'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
 
@@ -175,16 +204,12 @@ class HomeScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Home tab (active)
               _buildNavItem(
                 icon: Icons.home_filled,
                 label: 'Home',
                 isActive: true,
-                onTap: () {
-                  // Already on home screen
-                },
+                onTap: () {},
               ),
-              // Compare tab
               _buildNavItem(
                 icon: Icons.compare_arrows,
                 label: 'Compare',
@@ -198,7 +223,6 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
               ),
-              // Map tab
               _buildNavItem(
                 icon: Icons.location_on,
                 label: 'Map',
@@ -212,7 +236,6 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
               ),
-              // Account tab
               _buildNavItem(
                 icon: Icons.person,
                 label: 'Account',

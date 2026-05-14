@@ -3,6 +3,8 @@ import 'store_datasource.dart';
 
 /// Mock implementation of [StoreDatasource] for development and testing.
 final class StoreMockDatasource implements StoreDatasource {
+  const StoreMockDatasource();
+
   static const _nearbyStores = <StoreDto>[
     StoreDto(
       id: 'store-1',

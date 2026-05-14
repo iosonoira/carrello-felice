@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/models/store.dart';
+import '../../domain/entities/store.dart';
 
 /// A card widget displaying store information with three display variants.
 ///
